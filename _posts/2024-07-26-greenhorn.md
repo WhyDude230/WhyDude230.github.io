@@ -1,4 +1,7 @@
-#HTB 
+---
+image:
+  path: /assets/greenhorn/preview.jpg
+---
 # Introduction
 
 So this is a writeup of an easy machine i did in HackTheBox 
