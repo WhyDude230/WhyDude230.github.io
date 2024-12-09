@@ -4,6 +4,7 @@ published: 2024-10-09
 description: "this the greenhorn HTB machine's writeup"
 tags: [HTB, Machines]
 category: 'Machines'
+image: ../../assets/greenhorn/greenhorn.jpg
 draft: false 
 lang: 'en'
 ---

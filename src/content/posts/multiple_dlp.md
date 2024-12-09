@@ -3,6 +3,7 @@ title: Multiple DLP
 published: 2024-12-09
 description: This is the writeup of the Multiple DLP challenge from the round 49 of imaginary CTF
 tags: [Crypto, discrete-log]
+image: ../../assets/multiple_dlp/dlp.jpeg
 category: discrete-log
 draft: false
 ---

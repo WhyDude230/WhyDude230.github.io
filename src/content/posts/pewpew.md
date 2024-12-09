@@ -4,6 +4,7 @@ published: 2024-08-09
 description: 'pewpew writeup from Defensys CTF 2024'
 tags: [web, ctf]
 category: 'challenge'
+image: ../../assets/pewpew/pewpew.webp
 draft: false 
 lang: ''
 ---

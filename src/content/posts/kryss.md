@@ -3,6 +3,7 @@ title: kryss
 published: 2024-12-09
 description: 'kryss web writeup from DEFENSYS 2024 CTF'
 tags: [ctf, web, crypto]
+image: ../../assets/kryss/kryss.jpg
 category: 'challenge'
 draft: false 
 lang: 'en'

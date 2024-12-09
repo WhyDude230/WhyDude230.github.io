@@ -4,6 +4,7 @@ published: 2024-10-09
 description: 'Axlle HTB hard machine writeup'
 tags: [HTB, AD, Machines]
 category: 'Machines'
+image: ../../assets/axlle/Axlle.png
 draft: false 
 lang: 'en'
 ---
