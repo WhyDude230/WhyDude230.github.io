@@ -1,0 +1,242 @@
+---
+title: Multiple DLP
+published: 2024-12-09
+description: This is the writeup of the Multiple DLP challenge from the round 49 of imaginary CTF
+tags: [Crypto, discrete-log]
+category: discrete-log
+draft: false
+---
+
+```python
+from Crypto.Util.number import sieve_base 
+import re, math 
+
+with open("flag.txt", "rb") as f:
+	flag = f.read().strip() 
+
+assert re.fullmatch(r"ictf\{[a-zA-Z0-9_]{23}\}", flag.decode()) 
+secret = flag[5:-1] 
+p =60136177367560631039092956703653203338217286978701852857028839528525260293087 y = math.prod(pow(g, x, p) for g, x in zip(sieve_base, secret)) % p 
+print(f"{y = }") 
+# y = 36460313315646730969501498120968068746377445179920045296321232935228480996523
+```
+
+we have the following problem  $y = \prod{ g_i^{x_i} } \mod{p}$
+
+if we log both sides of the equation we will get :
+(consider $log$ as $log_g$  for simplicity)
+
+$$ log(y) = \sum{x_i . log(g_i) } \mod{p - 1} = \sum{x_i . log(g_i) } + k*(p-1) $$
+since we are working in $GF(p)$ we need to use discrete logarithm instead of real one and almost the same formulas of real logarithm will work
+
+after that we can use LLL to get the coefficients $x_i$
+
+## I - linearize our equation
+
+### 1 - calculate the log of y $log_g(y)$
+
+first lets consider a base point that should behave as a generator 
+
+```python
+import random
+p = 60136177367560631039092956703653203338217286978701852857028839528525260293087
+factors = [2, 30068088683780315519546478351826601669108643489350926428514419764262630146543]
+while True:
+    g = mod(random.randint(1,20), p)
+    for f in factors:
+        if pow(g, (p - 1) // f, p) == 1:
+            break
+    else:
+        print(f"we found g {g}")
+        break
+```
+gives us 5 so lets consider $g = 5$
+
+after that lets calculate the $log_g(y) \mod p - 1$  as in [[cado-nfs]]
+factors of `p - 1 = 2 * 30068088683780315519546478351826601669108643489350926428514419764262630146543`
+
+
+```bash
+./cado-nfs.py -dlp -ell 30068088683780315519546478351826601669108643489350926428514419764262630146543 target=36460313315646730969501498120968068746377445179920045296321232935228480996523 60136177367560631039092956703653203338217286978701852857028839528525260293087 -t 9 --server-threads 10
+```
+
+output:
+```bash
+...
+Info:root: logbase = 35942987590378272564072072056244205998473341132309895519613632537341176197631
+Info:root: target = 36460313315646730969501498120968068746377445179920045296321232935228480996523
+Info:root: log(target) = 5620509619453850296487890975724874866485150028863492327021993251713778571914 mod ell
+```
+
+$$log(target)=log_{base}(h) \mod ell$$
+
+
+
+now we need to calculate the $log_{base}(5)$
+```bash
+./cado-nfs.py -dlp -ell 30068088683780315519546478351826601669108643489350926428514419764262630146543 target=5 60136177367560631039092956703653203338217286978701852857028839528525260293087 -t 9 --server-threads 10
+```
+which gives:
+```
+target = 17777035453562109435852452325976291907192321649161551928719538748113365693149
+```
+
+now lets calculate $log_g(h) \mod{p - 1}$ with this formula : $$ log_g(h) = \frac{log_{base}(h)}{log_{base}(g)} \mod{ell} $$
+>[! warning] 
+>in order for this to work the both the logs should have same `logbase` the on in the cado-nfs output
+
+
+```python
+x = log_target_h * inverse_mod(log_target_g, ell) % ell
+```
+then use crt to find the $log_g(h) \mod{p - 1}$ since the other factor is 2 we can just bruteforce it, i created a function that does all of that
+```python
+def log_sieve_base_23(g, h, log_target_g, log_target_h, factors=factors):
+    ell = factors[1]
+    x = log_target_h * inverse_mod(log_target_g, ell) % ell
+    for i in range(2):
+        log_h = crt([i, x], factors)
+        if pow(g, log_h, p) == h:
+            return log_h
+    return None
+```
+
+
+### 2 - calculate the logs of $g_i$ 
+we can calculate multiple logs with same base and same `ell` in one command 
+```bash
+./cado-nfs.py -dlp -ell 30068088683780315519546478351826601669108643489350926428514419764262630146543 base=35942987590378272564072072056244205998473341132309895519613632537341176197631 target=19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83 60136177367560631039092956703653203338217286978701852857028839528525260293087 -t 9 --server-threads 10
+```
+
+from $log(2)$ to $log(19)$ are calculated by default so we collect those 
+```bash
+Checking that log(3)=15503689795227017074366775862579568598705749153369942543746442395219956718738 is correct in base 35942987590378272564072072056244205998473341132309895519613632537341176197631
+.....
+.....
+
+log(19)=13679195672830137201173409402143793366868850208809083161615174944820630432985 is correct in base 35942987590378272564072072056244205998473341132309895519613632537341176197631
+```
+and from 19 to 83 are at the end
+
+output :
+```bash
+target = 23
+log(target) = 15627637318719530563693249946576641325142142039651155754741490219582604999138 mod ell
+...
+...
+
+target = 83
+log(target) = 7138048963228519913088978273868175093412993514242091730368621418660463240151 mod ell
+```
+
+now lets recalculate those logs in base 5 same way as we did for $log_g(y)$ for g = 5
+
+after calculating those logs in base 5 now we move to the next step and use LLL
+
+
+## II - LLL to get the secret
+
+since we have this equation $$\sum{x_i . log(g_i) } + k*(p-1)$$ and $x_i$ are small we can get this with LLL
+
+
+$$
+
+\begin{bmatrix}
+
+log_5(g_0) & 1  & 0 & . & . & . \\
+
+log_5(g_1) & 0 & 1  & . & . & . \\
+
+    .     & . & . & . & .  & .\\
+	 .     & . & . & . & . & .\\
+
+log_5(g_{22}) & . & . & . & 1 & 0 \\
+
+ -log_5(y)    & 0 & 0 & . & . & 1\\
+ -(p-1)      & . & . & . & 0 & 0\\
+\end{bmatrix}
+$$
+
+### full script:
+```python
+import subprocess
+from pwn import *
+from Crypto.Util.number import sieve_base
+
+def log_sieve_base_23(g, h, log_target_g, log_target_h, factors=factors):
+    ell = factors[1]
+    x = log_target_h * inverse_mod(log_target_g, ell) % ell
+    for i in range(2):
+        log_h = crt([i, x], factors)
+        if pow(g, log_h, p) == h:
+            return log_h
+    return None
+
+g = 5
+y = 36460313315646730969501498120968068746377445179920045296321232935228480996523
+target_h = y
+log_target_h = 5620509619453850296487890975724874866485150028863492327021993251713778571914
+log_target_g = 17777035453562109435852452325976291907192321649161551928719538748113365693149
+log_base = 35942987590378272564072072056244205998473341132309895519613632537341176197631
+
+sieve_targets = [27452338898143769141752040340892997901006756005056349377291324791991268552177,
+15503689795227017074366775862579568598705749153369942543746442395219956718738,
+17777035453562109435852452325976291907192321649161551928719538748113365693149,
+10418018936369757409870478733721692791361659052244140802209536384178289601455, 
+14316436273633151493096463698654560724797013276337071113465900508947480091950, 
+13085411654322952272281404215440667029688614357896138683023130599465346737071, 
+1204026525849309730349959008101516872815103966425160682569050547745652637137,
+13679195672830137201173409402143793366868850208809083161615174944820630432985,
+15627637318719530563693249946576641325142142039651155754741490219582604999138,  
+3311025000274998956777463180468563889221098088300606468675256554740585936819,
+13394224004786687538797946016922173716941803470113352754912620750283321624369,
+7960372433498131029382121337479815593928741206898095919879643074057410813184,
+9183921887383866155593848749990895710999664732945412197112367523919174200055,
+22309430606034457658215596521357432526340189262038639262467313236034947245606,
+24223220227102056598520528368723667092717697338390935312722062107212641583539,
+24569410195512400392972074787761387775944673533182427090426927759995116696644,
+21208494415100863962862473833536795783629109356381472086117646439316037750650,
+8848656939242540914552693354245934746139356404295814596870110192825700950189,
+13865204594498365636034433994775749774747772066359517720728267573640677288609,
+4658679620696297560932663323577580319435805809545363270990447586709980333342,
+2022088643468294458942066204574305584607045605771351074564372463602561948007,
+4978724874241803532280711418802173922586683633156871239802920058437162557197,
+7138048963228519913088978273868175093412993514242091730368621418660463240151]
+
+
+sieve_base = sieve_base[:23]
+sieve_base_logs = []
+
+
+for i in range(len(sieve_base)):
+    #print(sieve_base[i], sieve_targets[i])
+    sieve_base_logs.append( log_sieve_base_23(g, sieve_base[i], log_target_g, sieve_targets[i]) )
+
+
+#log_target_h = 12278308952610312177405809232725815720939545907397558527812904898223176783283
+#log_target_g = 28606250632480685588055893016012961660841019154430284963473127710431262926489
+#log_base = 12042675330897517632756302419582375398273692185102103870750125275735020079052
+
+log_y = log_sieve_base_23(g, y, log_target_g, log_target_h)
+print(log_y)
+M = matrix(sieve_base_logs+[-log_y, p-1]).T.augment(identity_matrix(25))
+
+for i in M.LLL():
+    try:
+        print( bytes(list(map(abs,i[:-2])) ))
+    except:
+        continue
+```
+
+:::important
+because i used base 5 and there is a log(5) then log(5) = 1 so one of the $log_5(x_i) = 1$ so the corresponding coefficient $x_i$ wont be accurate
+:::
+
+
+:::note
+flag : `dl8_4nd_lll_5o_e4sy_lol` but it should be `dlp_4nd_lll_5o_e4sy_lol`
+:::
+
+
+
+

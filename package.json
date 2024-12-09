@@ -1,178 +1,71 @@
 {
-  "name": "jekyll-theme-chirpy",
-  "version": "7.0.1",
-  "description": "A minimal, responsive, and feature-rich Jekyll theme for technical writing.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cotes2020/jekyll-theme-chirpy.git"
-  },
-  "author": "Cotes Chung",
-  "license": "MIT",
-  "since": 2019,
-  "bugs": {
-    "url": "https://github.com/cotes2020/jekyll-theme-chirpy/issues"
-  },
-  "homepage": "https://github.com/cotes2020/jekyll-theme-chirpy/",
+  "name": "fuwari",
+  "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "build": "concurrently npm:build:*",
-    "build:css": "purgecss -c purgecss.config.js",
-    "build:js": "rollup -c --bundleConfigAsCjs --environment BUILD:production",
-    "watch:js": "rollup -c --bundleConfigAsCjs -w",
-    "lint:scss": "stylelint _sass/**/*.scss",
-    "lint:fix:scss": "npm run lint:scss -- --fix",
-    "test": "npm run lint:scss",
-    "prepare": "husky"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview",
+    "astro": "astro",
+    "type-check": "tsc --noEmit --isolatedDeclarations",
+    "new-post": "node scripts/new-post.js",
+    "format": "biome format --write ./src",
+    "lint": "biome check --apply ./src",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3"
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/rss": "^4.0.9",
+    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/svelte": "^6.0.1",
+    "@astrojs/tailwind": "^5.1.2",
+    "@fontsource-variable/jetbrains-mono": "^5.1.1",
+    "@fontsource/roboto": "^5.1.0",
+    "@iconify-json/fa6-brands": "^1.2.1",
+    "@iconify-json/fa6-regular": "^1.2.1",
+    "@iconify-json/fa6-solid": "^1.2.1",
+    "@iconify-json/material-symbols": "^1.2.5",
+    "@iconify/svelte": "^4.0.2",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@swup/astro": "^1.4.1",
+    "@tailwindcss/typography": "^0.5.15",
+    "astro": "^4.16.13",
+    "astro-compress": "^2.3.5",
+    "astro-icon": "^1.1.1",
+    "hastscript": "^9.0.0",
+    "markdown-it": "^14.1.0",
+    "mdast-util-to-string": "^4.0.0",
+    "overlayscrollbars": "^2.10.0",
+    "pagefind": "^1.1.1",
+    "photoswipe": "^5.4.4",
+    "reading-time": "^1.5.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-components": "^0.3.0",
+    "rehype-katex": "^7.0.1",
+    "rehype-slug": "^6.0.0",
+    "remark-directive": "^3.0.0",
+    "remark-directive-rehype": "^0.4.2",
+    "remark-github-admonitions-to-directives": "^1.0.5",
+    "remark-math": "^6.0.0",
+    "remark-sectionize": "^2.0.0",
+    "sanitize-html": "^2.13.1",
+    "sharp": "^0.33.5",
+    "stylus": "^0.63.0",
+    "svelte": "^5.2.2",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.7",
-    "@babel/plugin-transform-class-properties": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@astrojs/ts-plugin": "^1.10.4",
+    "@biomejs/biome": "1.8.3",
     "@rollup/plugin-yaml": "^4.1.2",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/exec": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "concurrently": "^8.2.2",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
-    "husky": "^9.0.11",
-    "purgecss": "^6.0.0",
-    "rollup": "^4.18.0",
-    "semantic-release": "^24.0.0",
-    "stylelint": "^16.6.1",
-    "stylelint-config-standard-scss": "^13.1.0"
+    "@types/markdown-it": "^14.1.2",
+    "@types/mdast": "^4.0.4",
+    "@types/sanitize-html": "^2.13.0",
+    "postcss-import": "^16.1.0",
+    "postcss-nesting": "^13.0.1"
   },
-  "prettier": {
-    "trailingComma": "none"
-  },
-  "browserslist": [
-    "last 2 versions",
-    "> 0.2%",
-    "not dead"
-  ],
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "body-max-line-length": [
-        0,
-        "always"
-      ]
-    }
-  },
-  "stylelint": {
-    "extends": "stylelint-config-standard-scss",
-    "rules": {
-      "no-descending-specificity": null,
-      "shorthand-property-no-redundant-values": null,
-      "at-rule-no-vendor-prefix": null,
-      "property-no-vendor-prefix": null,
-      "selector-no-vendor-prefix": null,
-      "value-no-vendor-prefix": null,
-      "color-function-notation": "legacy",
-      "alpha-value-notation": "number",
-      "selector-not-notation": "simple",
-      "color-hex-length": "long",
-      "declaration-block-single-line-max-declarations": 3,
-      "scss/operator-no-newline-after": null,
-      "rule-empty-line-before": [
-        "always",
-        {
-          "ignore": [
-            "after-comment",
-            "first-nested"
-          ]
-        }
-      ],
-      "value-keyword-case": [
-        "lower",
-        {
-          "ignoreProperties": [
-            "/^\\$/"
-          ]
-        }
-      ],
-      "media-feature-range-notation": "prefix"
-    }
-  },
-  "release": {
-    "branches": [
-      "production"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "conventionalcommits"
-        }
-      ],
-      [
-        "@semantic-release/release-notes-generator",
-        {
-          "preset": "conventionalcommits",
-          "presetConfig": {
-            "types": [
-              {
-                "type": "feat",
-                "section": "Features"
-              },
-              {
-                "type": "fix",
-                "section": "Bug Fixes"
-              },
-              {
-                "type": "perf",
-                "section": "Improvements"
-              },
-              {
-                "type": "refactor",
-                "section": "Changes",
-                "hidden": true
-              }
-            ]
-          }
-        }
-      ],
-      [
-        "@semantic-release/changelog",
-        {
-          "changelogFile": "docs/CHANGELOG.md",
-          "changelogTitle": "# Changelog"
-        }
-      ],
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ],
-      [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "bash tools/release.sh --prepare",
-          "publishCmd": "bash tools/release.sh"
-        }
-      ],
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "docs",
-            "package.json",
-            "*.gemspec"
-          ],
-          "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
-        }
-      ],
-      "@semantic-release/github"
-    ]
-  }
+  "packageManager": "pnpm@9.14.4"
 }
