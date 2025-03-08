@@ -139,4 +139,5 @@ BUUUT! the NTLM hash is encrypted in the ticket srvice TGS using the session key
 
 
 blog: https://i-tracing.com/blog/dacl-shadow-credentials/
+
 original paper:  https://eladshamir.com/2021/06/21/Shadow-Credentials.html
