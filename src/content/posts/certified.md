@@ -2,10 +2,10 @@
 title: certified
 published: 2025-03-08
 description: ''
-image: ''
-tags: []
+image: ../../assets/certified/certified.png
+tags: [HTB, AD, ADCS, PKINIT, shadow-credentiels]
 category: ''
-draft: true 
+draft: false 
 lang: ''
 ---
 
