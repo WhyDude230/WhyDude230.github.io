@@ -1,14 +1,18 @@
 ---
 title: signed
-published: 2025-10-17
-description: ''
-image: ''
-tags: []
-category: ''
+published: 2025-09-29
+description: 'Signed HTB medium machine writeup'
+tags: [HTB, AD, Machines]
+category: 'Machines'
+image: ../../assets/signed/image.png
 draft: false 
-lang: ''
+lang: 'en'
 ---
-# Description
+
+# HTB — Signed
+
+
+## Description
 
 A concise walkthrough of enumerating and attacking an MS SQL Server on a HackTheBox machine. I enumerate open services, authenticate to MSSQL, capture an NTLM hash via `xp_dirtree` and Responder, crack it, build a Silver Ticket to impersonate privileged users, escalate to a shell via `xp_cmdshell`, pivot to access AD services, and finally achieve SYSTEM via NTLM reflection / relay to WinRM.
 
